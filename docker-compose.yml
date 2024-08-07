@@ -1,0 +1,8 @@
+
+services:
+  react-app:
+    build:
+      context: . # Dockerfile'ın bulunduğu dizin
+    container_name: react-app
+    ports:
+      - "3000:80" # React uygulamanızın portu
