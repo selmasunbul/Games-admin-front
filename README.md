@@ -1,3 +1,9 @@
+** docker çalıştırmak için clonlanan app dizini terminalde açılır. "docker-compose up --build" komutu çalıştırılır.
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
