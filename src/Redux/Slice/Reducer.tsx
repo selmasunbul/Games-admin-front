@@ -122,3 +122,29 @@ export const AddConfiguration = (data: any): any => {
     }
   };
 };
+
+
+
+
+export const AddBuildingType = (data: any): any => {
+  return async (dispatch: Dispatch) => {
+    dispatch(startLoading());
+    try {
+      const options = {
+        method: "POST",
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        },
+        body:  JSON.stringify(data),
+      };
+      const response = await fetch(CONST.AddBuildingTypeURL, options);
+      const result = await response.json();
+      if (result.message)
+        alert(result.message);
+      return result;
+    } catch (error: any) {
+      dispatch(hasError(error.message));
+    }
+  };
+};

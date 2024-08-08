@@ -12,9 +12,14 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Dialog,
+  DialogContentText,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { AddConfiguration, GetAllBuildingType, GetAllConfiguration } from '../Redux/Slice/Reducer';
+import { AddBuildingType, AddConfiguration, GetAllBuildingType, GetAllConfiguration } from '../Redux/Slice/Reducer';
 import { BuildingType, JoinedResult } from '../Redux/Slice/Model/ConfigurationModel';
 
 interface Configuration {
@@ -27,16 +32,20 @@ interface Configuration {
 const ConfigurationsPage: React.FC = () => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [openSub, setOpenSub] = useState(false);
   const [buildingType, setBuildingType] = useState<BuildingType | null>(null);
   const [buildingCost, setBuildingCost] = useState<number | null>(null);
   const [constructionTime, setConstructionTime] = useState<number | null>(null);
   const [errors, setErrors] = useState({ buildingCost: '', constructionTime: '' });
-  const { Configurations, BuildingTypes } = useSelector((state: any) => state.Reducer);
+  const { Configurations } = useSelector((state: any) => state.Reducer);
+
+  const [BuildingTypes, setBuildingTypes] = useState<BuildingType[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      const buildingTypesResponse = await dispatch(GetAllBuildingType());
+      setBuildingTypes(buildingTypesResponse.data);  
       await dispatch(GetAllConfiguration());
-      await dispatch(GetAllBuildingType());
     };
 
     fetchData();
@@ -76,6 +85,32 @@ const ConfigurationsPage: React.FC = () => {
       setErrors({ buildingCost: '', constructionTime: '' });
 
       handleClose();
+    }
+  };
+
+  const buildingTypesWithAddOption = [
+    { oId: '0', name: 'Yeni Ekle' },
+    ...BuildingTypes  
+  ];
+
+  // sub modal
+  const handleOpenSubModal = () => setOpenSub(true);
+  const handleCloseSubModal = () => setOpenSub(false);
+
+  const [newBuildingType, setnewBuildingType] = useState("");
+
+  const handleBuildingTypeNew = async (value: string) => {
+    if (value) {
+      const newConfig: BuildingType = {
+        oId: "",
+        name: value
+      };
+      const result = await dispatch(AddBuildingType(newConfig));
+      if(result.status) {
+        const updatedBuildingTypes = await dispatch(GetAllBuildingType());
+        setBuildingTypes(updatedBuildingTypes.data);  // BuildingTypes state'ini güncelle
+        handleCloseSubModal();
+      }
     }
   };
 
@@ -119,10 +154,16 @@ const ConfigurationsPage: React.FC = () => {
           <Grid container spacing={2} sx={{ mt: 2 }}>
             <Grid item xs={12}>
               <Autocomplete
-                options={BuildingTypes || []}
+                options={buildingTypesWithAddOption}
                 getOptionLabel={(option: BuildingType) => option.name || ''}
                 value={buildingType}
-                onChange={(event, value) => setBuildingType(value || null)}
+                onChange={(event, value) => {
+                  if (value && value.oId === '0') {
+                    handleOpenSubModal();
+                  } else {
+                    setBuildingType(value || null);
+                  }
+                }}
                 renderInput={(params) => <TextField {...params} label="Bina Türü Seçin" variant="outlined" />}
               />
             </Grid>
@@ -161,6 +202,39 @@ const ConfigurationsPage: React.FC = () => {
           </Box>
         </Box>
       </Modal>
+      <Dialog
+        open={openSub}
+        onClose={handleCloseSubModal}
+        aria-labelledby="sub-dialog-title"
+        aria-describedby="sub-dialog-description"
+      >
+        <DialogTitle id="sub-dialog-title">
+          {"Yeni Bina Türü Ekle"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="sub-dialog-description">
+            Yeni bir bina türü eklemek üzeresiniz. Lütfen bina türünün adını girin.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Bina Türü Adı"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newBuildingType || ""}
+            onChange={(e) => setnewBuildingType(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSubModal} color="primary">
+            İptal
+          </Button>
+          <Button onClick={() => handleBuildingTypeNew(newBuildingType)} color="primary">
+            Kaydet
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

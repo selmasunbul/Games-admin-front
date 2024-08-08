@@ -8,4 +8,5 @@ export const CONST = {
 GetListConfigurationURL: apiURL + "Configuration/get-list",
 GetListBuildingTypeURL : apiURL + "Configuration/get-list-building-type",
 AddConfigurationURL : apiURL + "Configuration/add",
+AddBuildingTypeURL : apiURL + "Configuration/add-building-type",
 };
