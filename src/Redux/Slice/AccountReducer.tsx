@@ -45,7 +45,6 @@ export const login = (data: any): any => {
       };
       const response = await fetch(CONST.UserLogin, options);
       const result = await response.json();
-      debugger;
       if (result.message)
         alert(result.message);
       return result;
@@ -79,3 +78,22 @@ export const register = (data: any): any => {
 
 
 
+export const getHeaders = async (): Promise<HeadersInit> => {
+  const token = await getTokenAsync(); // Asenkron token alımı
+
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+// Örnek asenkron token alım fonksiyonu
+const getTokenAsync = async (): Promise<string | null> => {
+  // Asenkron bir işlemle token'ı al
+  return localStorage.getItem('token');
+};

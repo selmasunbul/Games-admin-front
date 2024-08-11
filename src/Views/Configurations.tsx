@@ -44,6 +44,7 @@ const ConfigurationsPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const buildingTypesResponse = await dispatch(GetAllBuildingType());
+      if(buildingTypesResponse && buildingTypesResponse.data )
       setBuildingTypes(buildingTypesResponse.data);  
       await dispatch(GetAllConfiguration());
     };

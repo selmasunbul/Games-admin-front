@@ -1,6 +1,7 @@
 import { createSlice, Dispatch } from "@reduxjs/toolkit";
 import { BuildingType, JoinedResult } from "./Model/ConfigurationModel";
 import { CONST } from "../CONST";
+import { getHeaders } from "./AccountReducer";
 
 type ReducerState = {
   isLoading: boolean;
@@ -50,20 +51,17 @@ export const {
 
 } = slice.actions;
 
-const token = localStorage.getItem('token');
-
 
 export const GetAllConfiguration = (): any => {
   return async (dispatch: Dispatch) => {
+    const headersAuthToken = await getHeaders();
     dispatch(startLoading());
     try {
       const options: any = {
         method: 'GET',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        }
+        headers: headersAuthToken
       };
+      debugger;
       let url = CONST.GetListConfigurationURL;
       const response = await fetch(url, options);
       const result = await response.json();
@@ -77,15 +75,14 @@ export const GetAllConfiguration = (): any => {
 
 
 export const GetAllBuildingType = (): any => {
+  
   return async (dispatch: Dispatch) => {
+    const headersAuthToken = await getHeaders();
     dispatch(startLoading());
     try {
       const options: any = {
         method: 'GET',
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        }
+        headers: headersAuthToken
       };
       let url = CONST.GetListBuildingTypeURL;
       const response = await fetch(url, options);
@@ -102,14 +99,12 @@ export const GetAllBuildingType = (): any => {
 
 export const AddConfiguration = (data: any): any => {
   return async (dispatch: Dispatch) => {
+    const headersAuthToken = await getHeaders();
     dispatch(startLoading());
     try {
       const options = {
         method: "POST",
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        },
+        headers: headersAuthToken,
         body:  JSON.stringify(data),
       };
       const response = await fetch(CONST.AddConfigurationURL, options);
@@ -129,13 +124,11 @@ export const AddConfiguration = (data: any): any => {
 export const AddBuildingType = (data: any): any => {
   return async (dispatch: Dispatch) => {
     dispatch(startLoading());
+    const headersAuthToken = await getHeaders();
     try {
       const options = {
         method: "POST",
-        headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
-          'Content-Type': 'application/json'
-        },
+        headers: headersAuthToken,
         body:  JSON.stringify(data),
       };
       const response = await fetch(CONST.AddBuildingTypeURL, options);
